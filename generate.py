@@ -92,21 +92,22 @@ def generate_func(name, command):
 def generate_funcs(feature, commands, version):
     with open(f'inc/glfuncs_{version}.inc', 'w') as fout:
         with open(f'inc/glfuncs_defun_{version}.inc', 'w') as fout_defun:
-            for elem in feature.iter(tag='command'):
-                name = elem.attrib['name']
+            for require in feature.iter(tag='require'):
+                for elem in require.iter(tag='command'):
+                    name = elem.attrib['name']
 
-                command = commands[name]
-                try:
-                    code, params = generate_func(name, command)
-                    fout.write(code)
+                    command = commands[name]
+                    try:
+                        code, params = generate_func(name, command)
+                        fout.write(code)
 
-                    emacs_name = command_name(name, '-')
-                    param_list = ' '.join(params)
-                    defun = f'DEFUN("{emacs_name}", F{command_name(name)}, {len(params)}, {len(params)}, "({emacs_name} {param_list})\\n{name}.", NULL);\n'
+                        emacs_name = command_name(name, '-')
+                        param_list = ' '.join(params)
+                        defun = f'DEFUN("{emacs_name}", F{command_name(name)}, {len(params)}, {len(params)}, "({emacs_name} {param_list})\\n{name}.", NULL);\n'
 
-                    fout_defun.write(defun)
-                except:
-                    print(f'Unsupported command: {name}')
+                        fout_defun.write(defun)
+                    except:
+                        print(f'Unsupported command: {name}')
 
 
 if __name__ == '__main__':

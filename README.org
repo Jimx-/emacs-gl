@@ -20,12 +20,12 @@ OpenGL bindings for Emacs Lisp.
   (gl-load-identity)
 
   (gl-begin GL-TRIANGLES)
-  (gl-color-3f 1.0 0.0 0.0)
-  (gl-vertex-3f -0.75 -0.75 0)
-  (gl-color-3f 0.0 1.0 0.0)
-  (gl-vertex-3f 0.75 -0.75 0)
-  (gl-color-3f 0.0 0.0 1.0)
-  (gl-vertex-3f 0.0 0.75 0)
+  (gl-color3f 1.0 0.0 0.0)
+  (gl-vertex3f -0.75 -0.75 0)
+  (gl-color3f 0.0 1.0 0.0)
+  (gl-vertex3f 0.75 -0.75 0)
+  (gl-color3f 0.0 0.0 1.0)
+  (gl-vertex3f 0.0 0.75 0)
   (gl-end))
 
 (let* ((buffer (get-buffer-create "*glarea-xwidget*"))

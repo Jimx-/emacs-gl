@@ -20,8 +20,8 @@ emacs_value Fgl_load(emacs_env* env, ptrdiff_t nargs, emacs_value args[],
 #include "inc/glfuncs_2_1.inc"
 #include "inc/glfuncs_3_0.inc"
 /* #include "inc/glfuncs_3_1.inc" */
-/* #include "inc/glfuncs_3_2.inc" */
-/* #include "inc/glfuncs_3_3.inc" */
+#include "inc/glfuncs_3_2.inc"
+#include "inc/glfuncs_3_3.inc"
 
 void glfuncs_init(emacs_env* env)
 {
@@ -39,7 +39,7 @@ void glfuncs_init(emacs_env* env)
 #include "inc/glfuncs_defun_2_0.inc"
 #include "inc/glfuncs_defun_2_1.inc"
 #include "inc/glfuncs_defun_3_0.inc"
-    /* #include "inc/glfuncs_defun_3_1.inc" */
-    /* #include "inc/glfuncs_defun_3_2.inc" */
-    /* #include "inc/glfuncs_defun_3_3.inc" */
+/* #include "inc/glfuncs_defun_3_1.inc" */
+#include "inc/glfuncs_defun_3_2.inc"
+#include "inc/glfuncs_defun_3_3.inc"
 }
