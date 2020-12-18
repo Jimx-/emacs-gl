@@ -4,5 +4,5 @@
 
 void glenums_init(emacs_env* env)
 {
-    #include "glenums.inc"
+    #include "inc/glenums_1_0.inc"
 }
