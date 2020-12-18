@@ -1,0 +1,14 @@
+DEFUN("gl-draw-arrays", Fgl_draw_arrays, 3, 3, "(gl-draw-arrays mode first count)\nglDrawArrays.", NULL);
+DEFUN("gl-polygon-offset", Fgl_polygon_offset, 2, 2, "(gl-polygon-offset factor units)\nglPolygonOffset.", NULL);
+DEFUN("gl-copy-tex-image1-d", Fgl_copy_tex_image1_d, 7, 7, "(gl-copy-tex-image1-d target level internalformat x y width border)\nglCopyTexImage1D.", NULL);
+DEFUN("gl-copy-tex-image2-d", Fgl_copy_tex_image2_d, 8, 8, "(gl-copy-tex-image2-d target level internalformat x y width height border)\nglCopyTexImage2D.", NULL);
+DEFUN("gl-copy-tex-sub-image1-d", Fgl_copy_tex_sub_image1_d, 6, 6, "(gl-copy-tex-sub-image1-d target level xoffset x y width)\nglCopyTexSubImage1D.", NULL);
+DEFUN("gl-copy-tex-sub-image2-d", Fgl_copy_tex_sub_image2_d, 8, 8, "(gl-copy-tex-sub-image2-d target level xoffset yoffset x y width height)\nglCopyTexSubImage2D.", NULL);
+DEFUN("gl-bind-texture", Fgl_bind_texture, 2, 2, "(gl-bind-texture target texture)\nglBindTexture.", NULL);
+DEFUN("gl-is-texture", Fgl_is_texture, 1, 1, "(gl-is-texture texture)\nglIsTexture.", NULL);
+DEFUN("gl-array-element", Fgl_array_element, 1, 1, "(gl-array-element i)\nglArrayElement.", NULL);
+DEFUN("gl-disable-client-state", Fgl_disable_client_state, 1, 1, "(gl-disable-client-state array)\nglDisableClientState.", NULL);
+DEFUN("gl-enable-client-state", Fgl_enable_client_state, 1, 1, "(gl-enable-client-state array)\nglEnableClientState.", NULL);
+DEFUN("gl-indexub", Fgl_indexub, 1, 1, "(gl-indexub c)\nglIndexub.", NULL);
+DEFUN("gl-pop-client-attrib", Fgl_pop_client_attrib, 0, 0, "(gl-pop-client-attrib )\nglPopClientAttrib.", NULL);
+DEFUN("gl-push-client-attrib", Fgl_push_client_attrib, 1, 1, "(gl-push-client-attrib mask)\nglPushClientAttrib.", NULL);
