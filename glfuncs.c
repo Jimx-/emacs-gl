@@ -2,8 +2,6 @@
 #include "emacs-module.h"
 #include <glad/glad.h>
 
-#include "glfuncs.h"
-
 emacs_value Fgl_load(emacs_env* env, ptrdiff_t nargs, emacs_value args[],
                      void* data)
 {
@@ -97,19 +95,6 @@ emacs_value Fgl_vertex_3f(emacs_env* env, ptrdiff_t nargs, emacs_value args[],
 
 void glfuncs_init(emacs_env* env)
 {
-    /* GL constants. */
-    defconsti(env, "GL-COLOR-BUFFER-BIT", GL_COLOR_BUFFER_BIT,
-              "GL_COLOR_BUFFER_BIT");
-    defconsti(env, "GL-DEPTH-BUFFER-BIT", GL_DEPTH_BUFFER_BIT,
-              "GL_DEPTH_BUFFER_BIT");
-
-    defconsti(env, "GL-MODELVIEW", GL_MODELVIEW, "GL_MODELVIEW");
-    defconsti(env, "GL-PROJECTION", GL_PROJECTION, "GL_PROJECTION");
-
-    defconsti(env, "GL-TRIANGLES", GL_TRIANGLES, "GL_TRIANGLES");
-    defconsti(env, "GL-QUADS", GL_QUADS, "GL_QUADS");
-
-    /* GL functions */
     DEFUN("gl-load", Fgl_load, 0, 0,
           "(gl-load).\n"
           "Load OpenGL function pointers.",

@@ -12,6 +12,7 @@ include_directories(${OPENGL_INCLUDE_DIR})
 set(GL_MODULE_SRCLIST
         gl-module.c
         emacs-module-helpers.c
+        glenums.c
         glfuncs.c
         )
         
