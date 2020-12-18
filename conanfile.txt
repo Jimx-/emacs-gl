@@ -1,0 +1,9 @@
+[requires]
+stb/20200203
+glad/0.1.33
+
+[generators]
+cmake
+
+[options]
+glad:gl_version = 4.3
