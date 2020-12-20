@@ -93,24 +93,43 @@ def generate_array(val, name, type, length, initializer, builder):
     return init, fini
 
 
-def generate_func(name, command):
-    func_name = command_name(name)
-
-    code = f'emacs_value F{func_name}(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)\n'
-    code += '{\n'
-
+def extract_params(command):
     params = dict()
-    dtors = []
-    for i, param in enumerate(command.iter(tag='param')):
+
+    for param in command.iter(tag='param'):
         length = param.attrib.get('len')
 
-        ptype = param.find('ptype').text
+        ptype_node = param.find('ptype')
+        if ptype_node is None:
+            ptype = '<unknown>'
+        else:
+            ptype = ptype_node.text
+
         pname = param.find('name').text
         group = param.attrib.get('group')
         param_info = dict(type=ptype)
 
         if group is not None:
             param_info['group'] = group
+
+        if length is not None:
+            param_info['length'] = length
+
+        params[pname] = param_info
+
+    return params
+
+
+def generate_func(name, command, params):
+    func_name = command_name(name)
+
+    code = f'emacs_value F{func_name}(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)\n'
+    code += '{\n'
+
+    dtors = []
+    for i, (pname, param) in enumerate(params.items()):
+        ptype = param['type']
+        length = param.get('length')
 
         initializer = PARAM_INITIALIZERS.get(ptype)
         if initializer is None:
@@ -123,14 +142,11 @@ def generate_func(name, command):
             code += initializer(f'args[{i}]')
             code += ';\n'
         else:
-            param_info['length'] = length
             if length.count('COMPSIZE') > 0: raise NotImplementedError
             init, fini = generate_array(f'args[{i}]', pname, ptype, length,
                                         initializer, builder)
             code += init
             dtors.append(fini)
-
-        params[pname] = param_info
 
     arg_list = ', '.join(params.keys())
     code += f'\t{name}({arg_list});\n'
@@ -140,7 +156,16 @@ def generate_func(name, command):
     code += '\treturn Qnil;\n'
     code += '}\n\n'
 
-    return code, params
+    return code
+
+
+def generate_func_stub(name):
+    func_name = command_name(name)
+
+    code = f'emacs_value __F{func_name}(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data) {{ return Qnil; }}\n'
+    code += f'emacs_value F{func_name}(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data) __attribute__((weak, alias("__F{func_name}")));\n'
+
+    return code
 
 
 def generate_func_docstring(name, params, groups, alias, vecequiv):
@@ -187,13 +212,14 @@ def generate_funcs(feature, commands, groups, version):
                 for elem in require.iter(tag='command'):
                     name = elem.attrib['name']
                     command = commands[name]
+                    params = extract_params(command)
 
                     try:
-                        code, params = generate_func(name, command)
+                        code = generate_func(name, command, params)
                         fout.write(code)
-                    except:
+                    except NotImplementedError:
                         print(f'Unsupported command: {name}')
-                        continue
+                        fout.write(generate_func_stub(name))
 
                     alias = None
                     vecequiv = None
