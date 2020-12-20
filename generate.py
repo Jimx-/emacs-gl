@@ -99,13 +99,18 @@ def generate_func(name, command):
     code = f'emacs_value F{func_name}(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)\n'
     code += '{\n'
 
-    params = []
+    params = dict()
     dtors = []
     for i, param in enumerate(command.iter(tag='param')):
         length = param.attrib.get('len')
 
-        ptype = param.findall('ptype')[0].text
-        pname = param.findall('name')[0].text
+        ptype = param.find('ptype').text
+        pname = param.find('name').text
+        group = param.attrib.get('group')
+        param_info = dict(type=ptype)
+
+        if group is not None:
+            param_info['group'] = group
 
         initializer = PARAM_INITIALIZERS.get(ptype)
         if initializer is None:
@@ -118,15 +123,16 @@ def generate_func(name, command):
             code += initializer(f'args[{i}]')
             code += ';\n'
         else:
+            param_info['length'] = length
             if length.count('COMPSIZE') > 0: raise NotImplementedError
             init, fini = generate_array(f'args[{i}]', pname, ptype, length,
                                         initializer, builder)
             code += init
             dtors.append(fini)
 
-        params.append(pname)
+        params[pname] = param_info
 
-    arg_list = ', '.join(params)
+    arg_list = ', '.join(params.keys())
     code += f'\t{name}({arg_list});\n'
 
     code += ''.join(dtors)
@@ -137,35 +143,95 @@ def generate_func(name, command):
     return code, params
 
 
-def generate_funcs(feature, commands, version):
+def generate_func_docstring(name, params, groups, alias, vecequiv):
+    docs = f'{name} command.\\n'
+
+    for i, (pname, param) in enumerate(params.items(), 1):
+        group = param.get('group')
+        length = param.get('length')
+
+        arg_name = f'ARG{i}'
+
+        if group is not None:
+            vals = groups.get(group)
+            type_desc = f'a {group}'
+
+            if vals is not None:
+                type_desc += ', one of ' + ', '.join(vals)
+        elif length is not None:
+            type_desc = f'an array of {param["type"]} values'
+        else:
+            type_desc = f'a {param["type"]} value'
+
+        arg = f'The argument {arg_name} ({pname}) should be {type_desc}.  '
+
+        if length is not None:
+            arg += f'The length of {arg_name} should be {length}.  '
+
+        docs += arg.strip() + '\\n'
+
+    if alias is not None:
+        docs += f'This command is an alias for {alias}.\\n'
+    if vecequiv is not None:
+        docs += f'The vector equivalent of this command is {vecequiv}.\\n'
+
+    docs += f'Manual page: <https://www.opengl.org/sdk/docs/man/html/{name}.xhtml>\\n'
+
+    return docs
+
+
+def generate_funcs(feature, commands, groups, version):
     with open(f'inc/glfuncs_{version}.inc', 'w') as fout:
         with open(f'inc/glfuncs_defun_{version}.inc', 'w') as fout_defun:
             for require in feature.iter(tag='require'):
                 for elem in require.iter(tag='command'):
                     name = elem.attrib['name']
-
                     command = commands[name]
+
                     try:
                         code, params = generate_func(name, command)
                         fout.write(code)
-
-                        emacs_name = command_name(name, '-')
-                        param_list = ' '.join(params)
-                        defun = f'DEFUN("{emacs_name}", F{command_name(name)}, {len(params)}, {len(params)}, "({emacs_name} {param_list})\\n{name}.", NULL);\n'
-
-                        fout_defun.write(defun)
                     except:
                         print(f'Unsupported command: {name}')
+                        continue
+
+                    alias = None
+                    vecequiv = None
+
+                    alias_node = command.find('alias')
+                    vecequiv_node = command.find('vecequiv')
+
+                    if alias_node is not None:
+                        print(alias_node)
+                        alias = alias_node.attrib['name']
+                    if vecequiv_node is not None:
+                        vecequiv = vecequiv_node.attrib['name']
+
+                    emacs_name = command_name(name, '-')
+                    docstring = generate_func_docstring(
+                        name, params, groups, alias, vecequiv)
+                    defun = f'DEFUN("{emacs_name}", F{command_name(name)}, {len(params)}, {len(params)}, "{docstring}", NULL);\n'
+
+                    fout_defun.write(defun)
 
 
 if __name__ == '__main__':
     spec = ET.ElementTree(file='gl.xml')
     command_list = spec.findall('commands')[0]
+    group_list = spec.findall('groups')[0]
 
     commands = dict()
     for command in command_list.iter(tag='command'):
         name = command.findall('.//name')[0].text
         commands[name] = command
+
+    groups = dict()
+    for group in group_list.iter(tag='group'):
+        name = group.attrib['name']
+        vals = []
+        for val in group.iter(tag='enum'):
+            vals.append(val.attrib['name'])
+        groups[name] = vals
 
     versions = {
         '1_0',
@@ -189,4 +255,4 @@ if __name__ == '__main__':
         if version not in versions: continue
 
         generate_enums(feature, version)
-        generate_funcs(feature, commands, version)
+        generate_funcs(feature, commands, groups, version)
