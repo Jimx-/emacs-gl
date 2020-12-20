@@ -24,40 +24,73 @@ def generate_enums(feature, version):
             )
 
 
-def generate_int_param(ptype):
-    def inner(idx, name):
-        return f'\t{ptype} {name} = extract_integer(env, args[{idx}]);\n'
-
-    return inner
+def generate_int_param(val):
+    return f'extract_integer(env, {val})'
 
 
-def generate_GLenum_param(idx, name):
-    return f'\tGLenum {name} = extract_integer(env, args[{idx}]);\n'
+def generate_double_param(val):
+    return f'extract_double(env, {val})'
 
 
-def generate_GLfloat_param(idx, name):
-    return f'\tGLfloat {name} = extract_float(env, args[{idx}]);\n'
+PARAM_INITIALIZERS = dict(
+    GLint=generate_int_param,
+    GLuint=generate_int_param,
+    GLsizei=generate_int_param,
+    GLshort=generate_int_param,
+    GLushort=generate_int_param,
+    GLboolean=generate_int_param,
+    GLbyte=generate_int_param,
+    GLubyte=generate_int_param,
+    GLbitfield=generate_int_param,
+    GLenum=generate_int_param,
+    GLfloat=generate_double_param,
+    GLdouble=generate_double_param,
+)
 
 
-def generate_double_param(type):
-    def inner(idx, name):
-        return f'\t{type} {name} = extract_double(env, args[{idx}]);\n'
-
-    return inner
+def build_int_param(val):
+    return f'env->make_integer(env, {val})'
 
 
-PARAM_GENERATOR = dict(GLint=generate_int_param('GLint'),
-                       GLuint=generate_int_param('GLuint'),
-                       GLsizei=generate_int_param('GLsizei'),
-                       GLshort=generate_int_param('GLshort'),
-                       GLushort=generate_int_param('GLushort'),
-                       GLboolean=generate_int_param('GLboolean'),
-                       GLbyte=generate_int_param('GLbyte'),
-                       GLubyte=generate_int_param('GLubyte'),
-                       GLbitfield=generate_int_param('GLbitfield'),
-                       GLenum=generate_GLenum_param,
-                       GLfloat=generate_double_param('GLfloat'),
-                       GLdouble=generate_double_param('GLdouble'))
+def build_float_param(val):
+    return f'env->make_float(env, {val})'
+
+
+VALUE_BUILDERS = dict(
+    GLint=build_int_param,
+    GLuint=build_int_param,
+    GLsizei=build_int_param,
+    GLshort=build_int_param,
+    GLushort=build_int_param,
+    GLboolean=build_int_param,
+    GLbyte=build_int_param,
+    GLubyte=build_int_param,
+    GLbitfield=build_int_param,
+    GLenum=build_int_param,
+    GLfloat=build_float_param,
+    GLdouble=build_float_param,
+)
+
+
+def generate_array(val, name, type, length, initializer, builder):
+    idx = f'_{name}_idx'
+    init = f'\t{type}* {name} = ({type}*) calloc({length}, sizeof({type}));\n'
+    init += '\t{\n'
+    init += f'\t\tint {idx};\n'
+    init += f'\t\tfor ({idx} = 0; {idx} < {length}; {idx}++)\n'
+    ref = f'env->vec_get(env, {val}, {idx})'
+    init += f'\t\t\t{name}[{idx}] = {initializer(ref)};\n'
+    init += '\t}\n'
+
+    fini = '\t{\n'
+    fini += f'\t\tint {idx};\n'
+    fini += f'\t\tfor ({idx} = 0; {idx} < {length}; {idx}++)\n'
+    ref = f'{name}[{idx}]'
+    fini += f'\t\t\tenv->vec_set(env, {val}, {idx}, {builder(ref)});\n'
+    fini += '\t}\n'
+    fini += f'\tfree({name});\n'
+
+    return init, fini
 
 
 def generate_func(name, command):
@@ -67,22 +100,37 @@ def generate_func(name, command):
     code += '{\n'
 
     params = []
+    dtors = []
     for i, param in enumerate(command.iter(tag='param')):
-        if param.attrib.get('len') is not None: raise NotImplementedError
+        length = param.attrib.get('len')
 
         ptype = param.findall('ptype')[0].text
         pname = param.findall('name')[0].text
 
-        generator = PARAM_GENERATOR.get(ptype)
-        if generator is None:
+        initializer = PARAM_INITIALIZERS.get(ptype)
+        if initializer is None:
             print(f'Unsupported type: {ptype}')
             raise NotImplementedError
+        builder = VALUE_BUILDERS.get(ptype)
 
-        code += generator(i, pname)
+        if length is None:
+            code += f'\t{ptype} {pname} = '
+            code += initializer(f'args[{i}]')
+            code += ';\n'
+        else:
+            if length.count('COMPSIZE') > 0: raise NotImplementedError
+            init, fini = generate_array(f'args[{i}]', pname, ptype, length,
+                                        initializer, builder)
+            code += init
+            dtors.append(fini)
+
         params.append(pname)
 
     arg_list = ', '.join(params)
     code += f'\t{name}({arg_list});\n'
+
+    code += ''.join(dtors)
+
     code += '\treturn Qnil;\n'
     code += '}\n\n'
 

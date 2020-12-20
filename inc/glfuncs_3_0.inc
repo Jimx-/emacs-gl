@@ -77,6 +77,46 @@ emacs_value Fgl_end_conditional_render(emacs_env* env, ptrdiff_t nargs, emacs_va
 	return Qnil;
 }
 
+emacs_value Fgl_get_vertex_attrib_iiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLenum pname = extract_integer(env, args[1]);
+	GLint* params = (GLint*) calloc(1, sizeof(GLint));
+	{
+		int _params_idx;
+		for (_params_idx = 0; _params_idx < 1; _params_idx++)
+			params[_params_idx] = extract_integer(env, env->vec_get(env, args[2], _params_idx));
+	}
+	glGetVertexAttribIiv(index, pname, params);
+	{
+		int _params_idx;
+		for (_params_idx = 0; _params_idx < 1; _params_idx++)
+			env->vec_set(env, args[2], _params_idx, env->make_integer(env, params[_params_idx]));
+	}
+	free(params);
+	return Qnil;
+}
+
+emacs_value Fgl_get_vertex_attrib_iuiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLenum pname = extract_integer(env, args[1]);
+	GLuint* params = (GLuint*) calloc(1, sizeof(GLuint));
+	{
+		int _params_idx;
+		for (_params_idx = 0; _params_idx < 1; _params_idx++)
+			params[_params_idx] = extract_integer(env, env->vec_get(env, args[2], _params_idx));
+	}
+	glGetVertexAttribIuiv(index, pname, params);
+	{
+		int _params_idx;
+		for (_params_idx = 0; _params_idx < 1; _params_idx++)
+			env->vec_set(env, args[2], _params_idx, env->make_integer(env, params[_params_idx]));
+	}
+	free(params);
+	return Qnil;
+}
+
 emacs_value Fgl_vertex_attrib_i1i(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
 {
 	GLuint index = extract_integer(env, args[0]);
@@ -153,6 +193,234 @@ emacs_value Fgl_vertex_attrib_i4ui(emacs_env* env, ptrdiff_t nargs, emacs_value 
 	return Qnil;
 }
 
+emacs_value Fgl_vertex_attrib_i1iv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLint* v = (GLint*) calloc(1, sizeof(GLint));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 1; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI1iv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 1; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i2iv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLint* v = (GLint*) calloc(2, sizeof(GLint));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 2; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI2iv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 2; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i3iv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLint* v = (GLint*) calloc(3, sizeof(GLint));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 3; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI3iv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 3; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i4iv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLint* v = (GLint*) calloc(4, sizeof(GLint));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI4iv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i1uiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLuint* v = (GLuint*) calloc(1, sizeof(GLuint));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 1; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI1uiv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 1; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i2uiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLuint* v = (GLuint*) calloc(2, sizeof(GLuint));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 2; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI2uiv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 2; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i3uiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLuint* v = (GLuint*) calloc(3, sizeof(GLuint));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 3; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI3uiv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 3; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i4uiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLuint* v = (GLuint*) calloc(4, sizeof(GLuint));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI4uiv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i4bv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLbyte* v = (GLbyte*) calloc(4, sizeof(GLbyte));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI4bv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i4sv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLshort* v = (GLshort*) calloc(4, sizeof(GLshort));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI4sv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i4ubv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLubyte* v = (GLubyte*) calloc(4, sizeof(GLubyte));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI4ubv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
+emacs_value Fgl_vertex_attrib_i4usv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLuint index = extract_integer(env, args[0]);
+	GLushort* v = (GLushort*) calloc(4, sizeof(GLushort));
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			v[_v_idx] = extract_integer(env, env->vec_get(env, args[1], _v_idx));
+	}
+	glVertexAttribI4usv(index, v);
+	{
+		int _v_idx;
+		for (_v_idx = 0; _v_idx < 4; _v_idx++)
+			env->vec_set(env, args[1], _v_idx, env->make_integer(env, v[_v_idx]));
+	}
+	free(v);
+	return Qnil;
+}
+
 emacs_value Fgl_uniform1ui(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
 {
 	GLint location = extract_integer(env, args[0]);
@@ -191,6 +459,86 @@ emacs_value Fgl_uniform4ui(emacs_env* env, ptrdiff_t nargs, emacs_value args[], 
 	return Qnil;
 }
 
+emacs_value Fgl_uniform1uiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLint location = extract_integer(env, args[0]);
+	GLsizei count = extract_integer(env, args[1]);
+	GLuint* value = (GLuint*) calloc(count*1, sizeof(GLuint));
+	{
+		int _value_idx;
+		for (_value_idx = 0; _value_idx < count*1; _value_idx++)
+			value[_value_idx] = extract_integer(env, env->vec_get(env, args[2], _value_idx));
+	}
+	glUniform1uiv(location, count, value);
+	{
+		int _value_idx;
+		for (_value_idx = 0; _value_idx < count*1; _value_idx++)
+			env->vec_set(env, args[2], _value_idx, env->make_integer(env, value[_value_idx]));
+	}
+	free(value);
+	return Qnil;
+}
+
+emacs_value Fgl_uniform2uiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLint location = extract_integer(env, args[0]);
+	GLsizei count = extract_integer(env, args[1]);
+	GLuint* value = (GLuint*) calloc(count*2, sizeof(GLuint));
+	{
+		int _value_idx;
+		for (_value_idx = 0; _value_idx < count*2; _value_idx++)
+			value[_value_idx] = extract_integer(env, env->vec_get(env, args[2], _value_idx));
+	}
+	glUniform2uiv(location, count, value);
+	{
+		int _value_idx;
+		for (_value_idx = 0; _value_idx < count*2; _value_idx++)
+			env->vec_set(env, args[2], _value_idx, env->make_integer(env, value[_value_idx]));
+	}
+	free(value);
+	return Qnil;
+}
+
+emacs_value Fgl_uniform3uiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLint location = extract_integer(env, args[0]);
+	GLsizei count = extract_integer(env, args[1]);
+	GLuint* value = (GLuint*) calloc(count*3, sizeof(GLuint));
+	{
+		int _value_idx;
+		for (_value_idx = 0; _value_idx < count*3; _value_idx++)
+			value[_value_idx] = extract_integer(env, env->vec_get(env, args[2], _value_idx));
+	}
+	glUniform3uiv(location, count, value);
+	{
+		int _value_idx;
+		for (_value_idx = 0; _value_idx < count*3; _value_idx++)
+			env->vec_set(env, args[2], _value_idx, env->make_integer(env, value[_value_idx]));
+	}
+	free(value);
+	return Qnil;
+}
+
+emacs_value Fgl_uniform4uiv(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLint location = extract_integer(env, args[0]);
+	GLsizei count = extract_integer(env, args[1]);
+	GLuint* value = (GLuint*) calloc(count*4, sizeof(GLuint));
+	{
+		int _value_idx;
+		for (_value_idx = 0; _value_idx < count*4; _value_idx++)
+			value[_value_idx] = extract_integer(env, env->vec_get(env, args[2], _value_idx));
+	}
+	glUniform4uiv(location, count, value);
+	{
+		int _value_idx;
+		for (_value_idx = 0; _value_idx < count*4; _value_idx++)
+			env->vec_set(env, args[2], _value_idx, env->make_integer(env, value[_value_idx]));
+	}
+	free(value);
+	return Qnil;
+}
+
 emacs_value Fgl_clear_bufferfi(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
 {
 	GLenum buffer = extract_integer(env, args[0]);
@@ -224,6 +572,44 @@ emacs_value Fgl_bind_renderbuffer(emacs_env* env, ptrdiff_t nargs, emacs_value a
 	return Qnil;
 }
 
+emacs_value Fgl_delete_renderbuffers(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLsizei n = extract_integer(env, args[0]);
+	GLuint* renderbuffers = (GLuint*) calloc(n, sizeof(GLuint));
+	{
+		int _renderbuffers_idx;
+		for (_renderbuffers_idx = 0; _renderbuffers_idx < n; _renderbuffers_idx++)
+			renderbuffers[_renderbuffers_idx] = extract_integer(env, env->vec_get(env, args[1], _renderbuffers_idx));
+	}
+	glDeleteRenderbuffers(n, renderbuffers);
+	{
+		int _renderbuffers_idx;
+		for (_renderbuffers_idx = 0; _renderbuffers_idx < n; _renderbuffers_idx++)
+			env->vec_set(env, args[1], _renderbuffers_idx, env->make_integer(env, renderbuffers[_renderbuffers_idx]));
+	}
+	free(renderbuffers);
+	return Qnil;
+}
+
+emacs_value Fgl_gen_renderbuffers(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLsizei n = extract_integer(env, args[0]);
+	GLuint* renderbuffers = (GLuint*) calloc(n, sizeof(GLuint));
+	{
+		int _renderbuffers_idx;
+		for (_renderbuffers_idx = 0; _renderbuffers_idx < n; _renderbuffers_idx++)
+			renderbuffers[_renderbuffers_idx] = extract_integer(env, env->vec_get(env, args[1], _renderbuffers_idx));
+	}
+	glGenRenderbuffers(n, renderbuffers);
+	{
+		int _renderbuffers_idx;
+		for (_renderbuffers_idx = 0; _renderbuffers_idx < n; _renderbuffers_idx++)
+			env->vec_set(env, args[1], _renderbuffers_idx, env->make_integer(env, renderbuffers[_renderbuffers_idx]));
+	}
+	free(renderbuffers);
+	return Qnil;
+}
+
 emacs_value Fgl_renderbuffer_storage(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
 {
 	GLenum target = extract_integer(env, args[0]);
@@ -246,6 +632,44 @@ emacs_value Fgl_bind_framebuffer(emacs_env* env, ptrdiff_t nargs, emacs_value ar
 	GLenum target = extract_integer(env, args[0]);
 	GLuint framebuffer = extract_integer(env, args[1]);
 	glBindFramebuffer(target, framebuffer);
+	return Qnil;
+}
+
+emacs_value Fgl_delete_framebuffers(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLsizei n = extract_integer(env, args[0]);
+	GLuint* framebuffers = (GLuint*) calloc(n, sizeof(GLuint));
+	{
+		int _framebuffers_idx;
+		for (_framebuffers_idx = 0; _framebuffers_idx < n; _framebuffers_idx++)
+			framebuffers[_framebuffers_idx] = extract_integer(env, env->vec_get(env, args[1], _framebuffers_idx));
+	}
+	glDeleteFramebuffers(n, framebuffers);
+	{
+		int _framebuffers_idx;
+		for (_framebuffers_idx = 0; _framebuffers_idx < n; _framebuffers_idx++)
+			env->vec_set(env, args[1], _framebuffers_idx, env->make_integer(env, framebuffers[_framebuffers_idx]));
+	}
+	free(framebuffers);
+	return Qnil;
+}
+
+emacs_value Fgl_gen_framebuffers(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLsizei n = extract_integer(env, args[0]);
+	GLuint* framebuffers = (GLuint*) calloc(n, sizeof(GLuint));
+	{
+		int _framebuffers_idx;
+		for (_framebuffers_idx = 0; _framebuffers_idx < n; _framebuffers_idx++)
+			framebuffers[_framebuffers_idx] = extract_integer(env, env->vec_get(env, args[1], _framebuffers_idx));
+	}
+	glGenFramebuffers(n, framebuffers);
+	{
+		int _framebuffers_idx;
+		for (_framebuffers_idx = 0; _framebuffers_idx < n; _framebuffers_idx++)
+			env->vec_set(env, args[1], _framebuffers_idx, env->make_integer(env, framebuffers[_framebuffers_idx]));
+	}
+	free(framebuffers);
 	return Qnil;
 }
 
@@ -349,6 +773,44 @@ emacs_value Fgl_bind_vertex_array(emacs_env* env, ptrdiff_t nargs, emacs_value a
 {
 	GLuint array = extract_integer(env, args[0]);
 	glBindVertexArray(array);
+	return Qnil;
+}
+
+emacs_value Fgl_delete_vertex_arrays(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLsizei n = extract_integer(env, args[0]);
+	GLuint* arrays = (GLuint*) calloc(n, sizeof(GLuint));
+	{
+		int _arrays_idx;
+		for (_arrays_idx = 0; _arrays_idx < n; _arrays_idx++)
+			arrays[_arrays_idx] = extract_integer(env, env->vec_get(env, args[1], _arrays_idx));
+	}
+	glDeleteVertexArrays(n, arrays);
+	{
+		int _arrays_idx;
+		for (_arrays_idx = 0; _arrays_idx < n; _arrays_idx++)
+			env->vec_set(env, args[1], _arrays_idx, env->make_integer(env, arrays[_arrays_idx]));
+	}
+	free(arrays);
+	return Qnil;
+}
+
+emacs_value Fgl_gen_vertex_arrays(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)
+{
+	GLsizei n = extract_integer(env, args[0]);
+	GLuint* arrays = (GLuint*) calloc(n, sizeof(GLuint));
+	{
+		int _arrays_idx;
+		for (_arrays_idx = 0; _arrays_idx < n; _arrays_idx++)
+			arrays[_arrays_idx] = extract_integer(env, env->vec_get(env, args[1], _arrays_idx));
+	}
+	glGenVertexArrays(n, arrays);
+	{
+		int _arrays_idx;
+		for (_arrays_idx = 0; _arrays_idx < n; _arrays_idx++)
+			env->vec_set(env, args[1], _arrays_idx, env->make_integer(env, arrays[_arrays_idx]));
+	}
+	free(arrays);
 	return Qnil;
 }
 

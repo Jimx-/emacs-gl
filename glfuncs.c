@@ -1,6 +1,7 @@
 #include "emacs-module-helpers.h"
 #include "emacs-module.h"
 #include <glad/glad.h>
+#include <stdlib.h>
 
 emacs_value Fgl_load(emacs_env* env, ptrdiff_t nargs, emacs_value args[],
                      void* data)
