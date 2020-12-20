@@ -126,6 +126,16 @@ def generate_func(name, command, params):
     code = f'emacs_value F{func_name}(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data)\n'
     code += '{\n'
 
+    ret_type = None
+    ret_type_node = command.find('./proto/ptype')
+    if ret_type_node is not None:
+        proto_node = command.find('proto')
+        if proto_node.text is not None and proto_node.text.count('const') > 0:
+            print(f'Non-scalar return value is not supported')
+            raise NotImplementedError
+
+        ret_type = ret_type_node.text
+
     dtors = []
     for i, (pname, param) in enumerate(params.items()):
         ptype = param['type']
@@ -149,11 +159,24 @@ def generate_func(name, command, params):
             dtors.append(fini)
 
     arg_list = ', '.join(params.keys())
-    code += f'\t{name}({arg_list});\n'
+    code += '\t'
+
+    if ret_type is not None:
+        code += f'{ret_type} retval = '
+
+    code += f'{name}({arg_list});\n'
 
     code += ''.join(dtors)
 
-    code += '\treturn Qnil;\n'
+    if ret_type is not None:
+        builder = VALUE_BUILDERS.get(ret_type)
+        if builder is None:
+            print(f'Unsupported return type: {ret_type}')
+            raise NotImplementedError
+        code += f'\treturn {builder("retval")};\n'
+    else:
+        code += '\treturn Qnil;\n'
+
     code += '}\n\n'
 
     return code
