@@ -1,6 +1,7 @@
 /* From https://github.com/jkitchin/emacs-modules */
 #include "emacs-module-helpers.h"
 #include "emacs-module.h"
+#include <stdlib.h>
 #include <string.h>
 
 emacs_value Qt;
@@ -30,6 +31,25 @@ int extract_integer(emacs_env* env, emacs_value arg)
         result = (int)env->extract_float(env, arg);
     }
     return result;
+}
+
+char* copy_string_contents(emacs_env* env, emacs_value arg, size_t* len)
+{
+    char* buffer;
+    ptrdiff_t buf_size;
+
+    if (!env->copy_string_contents(env, arg, NULL, &buf_size)) return NULL;
+
+    buffer = malloc(buf_size);
+    if (!buffer) return NULL;
+
+    if (!env->copy_string_contents(env, arg, buffer, &buf_size)) {
+        free(buffer);
+        return NULL;
+    }
+
+    if (len) *len = buf_size;
+    return buffer;
 }
 
 // define a constant that is an integer in emacs

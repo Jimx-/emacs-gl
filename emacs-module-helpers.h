@@ -64,6 +64,7 @@ void defconst(emacs_env* env, const char* name, double value, const char* doc);
 
 double extract_double(emacs_env* env, emacs_value arg);
 int extract_integer(emacs_env* env, emacs_value arg);
+char* copy_string_contents(emacs_env* env, emacs_value arg, size_t* len);
 
 emacs_value intern(emacs_env* env, const char* feature);
 

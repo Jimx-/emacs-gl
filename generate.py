@@ -185,8 +185,7 @@ def generate_func(name, command, params):
 def generate_func_stub(name):
     func_name = command_name(name)
 
-    code = f'emacs_value __F{func_name}(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data) {{ return Qnil; }}\n'
-    code += f'emacs_value F{func_name}(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data) __attribute__((weak, alias("__F{func_name}")));\n'
+    code = f' __attribute__((weak)) emacs_value F{func_name}(emacs_env* env, ptrdiff_t nargs, emacs_value args[], void* data);\n'
 
     return code
 
@@ -236,6 +235,7 @@ def generate_funcs(feature, commands, groups, version):
                     name = elem.attrib['name']
                     command = commands[name]
                     params = extract_params(command)
+                    stub = False
 
                     try:
                         code = generate_func(name, command, params)
@@ -243,6 +243,7 @@ def generate_funcs(feature, commands, groups, version):
                     except NotImplementedError:
                         print(f'Unsupported command: {name}')
                         fout.write(generate_func_stub(name))
+                        stub = True
 
                     alias = None
                     vecequiv = None
@@ -259,7 +260,11 @@ def generate_funcs(feature, commands, groups, version):
                     emacs_name = command_name(name, '-')
                     docstring = generate_func_docstring(
                         name, params, groups, alias, vecequiv)
-                    defun = f'DEFUN("{emacs_name}", F{command_name(name)}, {len(params)}, {len(params)}, "{docstring}", NULL);\n'
+
+                    defun = ''
+                    if stub:
+                        defun = f'if (F{command_name(name)})\n\t'
+                    defun += f'DEFUN("{emacs_name}", F{command_name(name)}, {len(params)}, {len(params)}, "{docstring}", NULL);\n'
 
                     fout_defun.write(defun)
 
