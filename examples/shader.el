@@ -2,7 +2,7 @@
 (require 'gl-module)
 
 
-(defun init-cb ()
+(defun init-cb (width height)
   (gl-load)
 
   (let* ((vertex-shader (gl-create-shader GL-VERTEX-SHADER))

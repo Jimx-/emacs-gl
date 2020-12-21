@@ -1,37 +1,57 @@
 * Emacs-gl
-OpenGL bindings for Emacs Lisp.
+OpenGL bindings for Emacs Lisp. It enables drawing to Emacs buffers with OpenGL through a [[https://github.com/Jimx-/emacs][GLArea]] xwidget embedded in the buffers.
 
-** Example
+#+HTML:<div align=center>
+#+HTML: <a href="https://github.com/Jimx-/emacs-gl"><img alt="screenshot" src="https://i.imgur.com/SvU3VtL.png"></a>
+#+HTML:</div>
+
+** Features
+- Raw bindings for OpenGL commands up to version 3.3
+- Helper functions for loading images into textures (~gl-helper-load-texture~ and ~gl-helper-bind-texture~)
+- [[https://github.com/ocornut/imgui][ImGui]]-based GUI rendering
+
+** Installation
+*** Requirements
+1. GNU Emacs with the GLArea xwidget feature and module support.
+You can build the feature from the ~feature/glarea~ branch of this [[https://github.com/Jimx-/emacs][repo]] using the following commands:
+#+BEGIN_SRC shell
+git clone -b feature/glarea https://github.com/Jimx-/emacs.git
+cd emacs
+./autogen.sh
+./configure --with-xwidgets --with-x-toolkit=gtk --with-modules 
+make
+#+END_SRC
+
+2. CMake (>= 3.11)
+3. [[https://conan.io/][Conan]]
+4. Python 3.8
+
+*** Building the module
+To build the module itself, first clone this repo:
+#+BEGIN_SRC shell
+git clone https://github.com/Jimx-/emacs-gl.git
+cd emacs-gl
+#+END_SRC
+
+Build the module with:
+#+BEGIN_SRC shell
+python generate.py
+mkdir build
+cd build
+conan install ..
+cmake ..
+make
+#+END_SRC
+After that, you should see a ~gl-module.so~ under the root directory of the repo. To load the module:
 #+BEGIN_SRC emacs-lisp
-(require 'xwidget)
+(add-to-list 'load-path "path/to/emacs-gl")
 (require 'gl-module)
+#+END_SRC
 
-(defun init-cb ()
-  (gl-load))
-
-(defun render-cb ()
-  (gl-clear-color 0.5 0.5 0.5 1.0)
-  (gl-clear GL-COLOR-BUFFER-BIT)
-
-  (gl-matrix-mode GL-PROJECTION)
-  (gl-load-identity)
-
-  (gl-matrix-mode GL-MODELVIEW)
-  (gl-load-identity)
-
-  (gl-begin GL-TRIANGLES)
-  (gl-color3f 1.0 0.0 0.0)
-  (gl-vertex3f -0.75 -0.75 0)
-  (gl-color3f 0.0 1.0 0.0)
-  (gl-vertex3f 0.75 -0.75 0)
-  (gl-color3f 0.0 0.0 1.0)
-  (gl-vertex3f 0.0 0.75 0)
-  (gl-end))
-
-(let* ((buffer (get-buffer-create "*glarea-xwidget*"))
-       (window (split-window (selected-window) 20)))
-  (set-window-buffer window buffer)
-  (with-current-buffer buffer
+** Usage
+Before using any command provided by the module, you should make sure that a GL context is properly set up. This can be done by creating a GLArea xwidget. This xwidget also provides an area for these commands to draw to.
+#+BEGIN_SRC emacs-lisp
+(with-current-buffer buffer
     (insert " ")
     (goto-char 1)
     (let ((id (make-xwidget
@@ -42,5 +62,37 @@ OpenGL bindings for Emacs Lisp.
                '(:init init-cb :render render-cb)
                (buffer-name))))
       (put-text-property (point) (+ 1 (point))
-                         'display (list 'xwidget ':xwidget id)))))
+                         'display (list 'xwidget ':xwidget id))))
 #+END_SRC
+
+You also need to provide two callback functions to this xwidget. They are called by the xwidget to initialize the context and render the frames, respectively. The init callback will be invoked before the first frame is rendered with an active GL context so it's the ideal place to load the GL function pointers:
+#+BEGIN_SRC emacs-lisp
+(defun init-cb (width height)
+  (gl-load))
+#+END_SRC 
+
+You can also initialize some global resources in this callback:
+#+BEGIN_SRC emacs-lisp
+(defun init-cb (width height)
+  ...
+  (setq texture (gl-helper-load-texture "foo.png")))
+#+END_SRC
+
+The render callback is invoked when the xwidget needs to be redrawed. You can use the GL commands provided by the module to draw to the framebuffer:
+#+BEGIN_SRC emacs-lisp
+(defun render-cb ()
+  (gl-clear-color 1.0 1.0 1.0 1.0)
+  (gl-clear GL-COLOR-BUFFER-BIT)
+
+  (gl-begin GL-TRIANGLES)
+  (gl-color3f 1.0 0.0 0.0)
+  (gl-vertex3f -0.4 -0.7 0.5)
+  (gl-color3f 0.0 1.0 0.0)
+  (gl-vertex3f 0.8 -0.7 0.5)
+  (gl-color3f 0.0 0.0 1.0)
+  (gl-vertex3f 0.2 0.5 0.5)
+  (gl-end))
+#+END_SRC
+
+More examples can be found [[https://github.com/Jimx-/emacs-gl/tree/master/examples][here]].
+

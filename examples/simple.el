@@ -1,7 +1,7 @@
 (require 'xwidget)
 (require 'gl-module)
 
-(defun init-cb ()
+(defun init-cb (width height)
   (gl-load))
 
 (defun render-cb ()
