@@ -12,10 +12,7 @@
   (gl-load-identity)
 
   (gl-matrix-mode GL-MODELVIEW)
-  (gl-load-matrixf [1.0 0.0 0.0 0.0
-                        0.0 1.0 0.0 0.0
-                        0.0 0.0 1.0 0.0
-                        0.0 0.0 0.0 1.0])
+  (gl-load-identity)
 
   (gl-begin GL-TRIANGLES)
   (gl-color3f 1.0 0.0 0.0)

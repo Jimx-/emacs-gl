@@ -1,6 +1,7 @@
 [requires]
 stb/20200203
 glad/0.1.33
+imgui/1.79
 
 [generators]
 cmake

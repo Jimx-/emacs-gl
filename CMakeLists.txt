@@ -14,8 +14,9 @@ set(GL_MODULE_SRCLIST
         emacs-module-helpers.c
         glenums.c
         glfuncs.c
+        texture.c
         )
-        
+
 add_library(gl-module MODULE ${GL_MODULE_SRCLIST})
 set_target_properties(gl-module PROPERTIES
   C_STANDARD 99
@@ -24,4 +25,4 @@ set_target_properties(gl-module PROPERTIES
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}
   )
 
-target_link_libraries(gl-module PUBLIC CONAN_PKG::glad OpenGL::GLX)
+target_link_libraries(gl-module CONAN_PKG::glad OpenGL::GLX CONAN_PKG::stb)
