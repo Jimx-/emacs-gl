@@ -8,3 +8,6 @@ cmake
 
 [options]
 glad:gl_version = 4.3
+
+[imports]
+res/bindings, imgui_impl_opengl3.* -> ./imgui

@@ -4,6 +4,11 @@
 #ifndef EMACS_MODULE_HELPERS_H_
 #define EMACS_MODULE_HELPERS_H_
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 //  from dbg.h in Learn C the Hard Way
 #include <errno.h>
 #include <stdio.h>
@@ -53,29 +58,35 @@
         goto error;              \
     }
 
-/* Emacs symbols. */
-extern emacs_value Qt;
-extern emacs_value Qnil;
+    /* Emacs symbols. */
+    extern emacs_value Qt;
+    extern emacs_value Qnil;
 
-void defconsti(emacs_env* env, const char* name, int value, const char* doc);
-void defconsts(emacs_env* env, const char* name, const char* value,
-               const char* doc);
-void defconst(emacs_env* env, const char* name, double value, const char* doc);
+    void defconsti(emacs_env* env, const char* name, int value,
+                   const char* doc);
+    void defconsts(emacs_env* env, const char* name, const char* value,
+                   const char* doc);
+    void defconst(emacs_env* env, const char* name, double value,
+                  const char* doc);
 
-double extract_double(emacs_env* env, emacs_value arg);
-int extract_integer(emacs_env* env, emacs_value arg);
-char* copy_string_contents(emacs_env* env, emacs_value arg, size_t* len);
+    double extract_double(emacs_env* env, emacs_value arg);
+    int extract_integer(emacs_env* env, emacs_value arg);
+    char* copy_string_contents(emacs_env* env, emacs_value arg, size_t* len);
 
-emacs_value intern(emacs_env* env, const char* feature);
+    emacs_value intern(emacs_env* env, const char* feature);
 
-void bind_function(emacs_env* env, const char* name, emacs_value Sfun);
+    void bind_function(emacs_env* env, const char* name, emacs_value Sfun);
 // I could not figure out how to define this as a function, so we use this
 // define instead.
 #define DEFUN(lsym, csym, amin, amax, doc, data) \
     bind_function(env, lsym,                     \
                   env->make_function(env, amin, amax, csym, doc, data))
 
-void provide(emacs_env* env, const char* feature);
-void require(emacs_env* env, const char* feature);
+    void provide(emacs_env* env, const char* feature);
+    void require(emacs_env* env, const char* feature);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // EMACS_MODULE_HELPERS_H_

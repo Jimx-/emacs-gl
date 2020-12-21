@@ -4,10 +4,11 @@
 
 int plugin_is_GPL_compatible;
 
-void glenums_init(emacs_env* env);
-void glfuncs_init(emacs_env* env);
+extern void glenums_init(emacs_env* env);
+extern void glfuncs_init(emacs_env* env);
 
-void gl_helper_texture_init(emacs_env* env);
+extern void gl_helper_texture_init(emacs_env* env);
+extern void gl_helper_gui_init(emacs_env* env);
 
 int emacs_module_init(struct emacs_runtime* ert)
 {
@@ -20,6 +21,7 @@ int emacs_module_init(struct emacs_runtime* ert)
     glfuncs_init(env);
 
     gl_helper_texture_init(env);
+    gl_helper_gui_init(env);
 
     provide(env, "gl-module");
     return 0;
