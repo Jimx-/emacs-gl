@@ -18,6 +18,14 @@
 
   (gl-helper-ui-render))
 
+(defun cursor-pos-cb (x y)
+  (gl-helper-ui-cursor-pos-callback x y)
+  (xwidget-queue-redraw widget))
+
+(defun mouse-button-cb (button action)
+  (gl-helper-ui-mouse-button-callback button action)
+  (xwidget-queue-redraw widget))
+
 (let* ((buffer (get-buffer-create "*glarea-xwidget*"))
        (window (split-window (selected-window) 20)))
   (set-window-buffer window buffer)
@@ -29,7 +37,10 @@
                nil
                1
                1
-               '(:init init-cb :render render-cb)
+               '(:init init-cb
+                       :render render-cb
+                       :cursor-pos cursor-pos-cb
+                       :mouse-button mouse-button-cb)
                (buffer-name))))
       (put-text-property (point) (+ 1 (point))
                          'display (list 'xwidget ':xwidget id)))))

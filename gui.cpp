@@ -8,6 +8,8 @@
 
 emacs_value Qdark;
 emacs_value Qclassic;
+emacs_value Qpress;
+emacs_value Qrelease;
 
 extern "C"
 {
@@ -64,6 +66,35 @@ extern "C"
         return Qnil;
     }
 
+    static emacs_value Fgl_helper_ui_cursor_pos_callback(emacs_env* env,
+                                                         ptrdiff_t nargs,
+                                                         emacs_value args[],
+                                                         void* data)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        double x = extract_double(env, args[0]);
+        double y = extract_double(env, args[1]);
+
+        io.MousePos.x = x;
+        io.MousePos.y = y;
+
+        return Qnil;
+    }
+
+    static emacs_value Fgl_helper_ui_mouse_button_callback(emacs_env* env,
+                                                           ptrdiff_t nargs,
+                                                           emacs_value args[],
+                                                           void* data)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        int button = extract_integer(env, args[0]);
+        emacs_value action = args[1];
+
+        if (button > 0) io.MouseDown[button - 1] = env->eq(env, action, Qpress);
+
+        return Qnil;
+    }
+
     static emacs_value Fgl_helper_ui_begin_window(emacs_env* env,
                                                   ptrdiff_t nargs,
                                                   emacs_value args[],
@@ -108,6 +139,9 @@ extern "C"
         Qdark = env->make_global_ref(env, env->intern(env, "dark"));
         Qclassic = env->make_global_ref(env, env->intern(env, "classic"));
 
+        Qpress = env->make_global_ref(env, env->intern(env, "press"));
+        Qrelease = env->make_global_ref(env, env->intern(env, "release"));
+
         DEFUN("gl-helper-ui-init", Fgl_helper_ui_init, 3, 3,
               "Initialize GUI context.\n"
               "The argument ARG1 is the width of the display area.\n"
@@ -122,6 +156,12 @@ extern "C"
             NULL);
         DEFUN("gl-helper-ui-render", Fgl_helper_ui_render, 0, 0,
               "Render GUI to current frame.\n", NULL);
+        DEFUN("gl-helper-ui-cursor-pos-callback",
+              Fgl_helper_ui_cursor_pos_callback, 2, 2,
+              "Process cursor position update event.\n", NULL);
+        DEFUN("gl-helper-ui-mouse-button-callback",
+              Fgl_helper_ui_mouse_button_callback, 2, 2,
+              "Process mouse button event.\n", NULL);
 
         DEFUN("gl-helper-ui-begin-window", Fgl_helper_ui_begin_window, 1, 1,
               "Create a new window.\n"
