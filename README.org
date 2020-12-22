@@ -45,7 +45,7 @@ make
 After that, you should see a ~gl-module.so~ under the root directory of the repo. To load the module:
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "path/to/emacs-gl")
-(require 'gl-module)
+(require 'gl)
 #+END_SRC
 
 ** Usage

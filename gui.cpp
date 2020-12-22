@@ -1,7 +1,7 @@
 #include "emacs-module-helpers.h"
 #include "emacs-module.h"
+#include <cstdlib>
 #include <glad/glad.h>
-#include <stdlib.h>
 
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
@@ -39,6 +39,9 @@ extern "C"
 
         ImGui_ImplOpenGL3_Init("#version 150");
 
+        for (int i = 0; i < IM_ARRAYSIZE(io.KeyMap); i++)
+            io.KeyMap[i] = i;
+
         return Qnil;
     }
 
@@ -59,9 +62,13 @@ extern "C"
     static emacs_value Fgl_helper_ui_render(emacs_env* env, ptrdiff_t nargs,
                                             emacs_value args[], void* data)
     {
+        ImGuiIO& io = ImGui::GetIO();
+
         ImGui::EndFrame();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        memset(io.KeysDown, 0, sizeof(io.KeysDown));
 
         return Qnil;
     }
@@ -91,6 +98,48 @@ extern "C"
         emacs_value action = args[1];
 
         if (button > 0) io.MouseDown[button - 1] = env->eq(env, action, Qpress);
+
+        return Qnil;
+    }
+
+    static emacs_value Fgl_helper_ui_send_key(emacs_env* env, ptrdiff_t nargs,
+                                              emacs_value args[], void* data)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        char* str = copy_string_contents(env, args[0], NULL);
+        char key = '\0';
+
+        if (!strcmp(str, "SPC")) {
+            key = ' ';
+        } else if (!strcmp(str, "<backspace>")) {
+            io.KeysDown[ImGuiKey_Backspace] = true;
+        } else if (!strcmp(str, "<tab>")) {
+            io.KeysDown[ImGuiKey_Tab] = true;
+        } else if (!strcmp(str, "<return>")) {
+            io.KeysDown[ImGuiKey_Enter] = true;
+        } else if (!strcmp(str, "<left>")) {
+            io.KeysDown[ImGuiKey_LeftArrow] = true;
+        } else if (!strcmp(str, "<right>")) {
+            io.KeysDown[ImGuiKey_RightArrow] = true;
+        } else if (!strcmp(str, "<up>")) {
+            io.KeysDown[ImGuiKey_UpArrow] = true;
+        } else if (!strcmp(str, "<down>")) {
+            io.KeysDown[ImGuiKey_DownArrow] = true;
+        } else if (!strcmp(str, "<delete>")) {
+            io.KeysDown[ImGuiKey_Delete] = true;
+        } else if (!strcmp(str, "<home>")) {
+            io.KeysDown[ImGuiKey_Home] = true;
+        } else if (!strcmp(str, "<end>")) {
+            io.KeysDown[ImGuiKey_End] = true;
+        } else if (!strcmp(str, "<escape>")) {
+            io.KeysDown[ImGuiKey_Escape] = true;
+        } else {
+            key = *str;
+        }
+
+        free(str);
+
+        if (key) io.AddInputCharacter(key);
 
         return Qnil;
     }
@@ -125,6 +174,23 @@ extern "C"
 
         if (clicked) return Qt;
         return Qnil;
+    }
+
+    static emacs_value Fgl_helper_ui_input_text(emacs_env* env, ptrdiff_t nargs,
+                                                emacs_value args[], void* data)
+    {
+        char buf[4096];
+        char* text = copy_string_contents(env, args[0], NULL);
+        char* str = copy_string_contents(env, args[1], NULL);
+
+        buf[0] = '\0';
+        strncat(buf, str, sizeof(buf) - 1);
+        free(str);
+
+        ImGui::InputText(text, buf, sizeof(buf));
+        free(text);
+
+        return env->make_string(env, buf, (ptrdiff_t)strlen(buf));
     }
 
     static emacs_value Fgl_helper_ui_end_window(emacs_env* env, ptrdiff_t nargs,
@@ -162,6 +228,8 @@ extern "C"
         DEFUN("gl-helper-ui-mouse-button-callback",
               Fgl_helper_ui_mouse_button_callback, 2, 2,
               "Process mouse button event.\n", NULL);
+        DEFUN("gl-helper-ui-send-key", Fgl_helper_ui_send_key, 4, 4,
+              "Add a key to the GUI input buffer.\n", NULL);
 
         DEFUN("gl-helper-ui-begin-window", Fgl_helper_ui_begin_window, 1, 1,
               "Create a new window.\n"
@@ -177,6 +245,10 @@ extern "C"
         DEFUN("gl-helper-ui-button", Fgl_helper_ui_button, 1, 1,
               "Display a button on the current window.\n"
               "The argument ARG1 is the caption of the button",
+              NULL);
+        DEFUN("gl-helper-ui-input-text", Fgl_helper_ui_input_text, 2, 2,
+              "Display a text input on the current window.\n"
+              "The argument ARG1 is the label to display",
               NULL);
     }
 }
