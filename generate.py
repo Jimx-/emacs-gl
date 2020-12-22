@@ -228,6 +228,8 @@ def generate_func_docstring(name, params, groups, alias, vecequiv):
 
 
 def generate_funcs(feature, commands, groups, version):
+    funcs = dict()
+
     with open(f'inc/glfuncs_{version}.inc', 'w') as fout:
         with open(f'inc/glfuncs_defun_{version}.inc', 'w') as fout_defun:
             for require in feature.iter(tag='require'):
@@ -236,6 +238,8 @@ def generate_funcs(feature, commands, groups, version):
                     command = commands[name]
                     params = extract_params(command)
                     stub = False
+
+                    funcs[name] = params
 
                     try:
                         code = generate_func(name, command, params)
@@ -267,6 +271,8 @@ def generate_funcs(feature, commands, groups, version):
                     defun += f'DEFUN("{emacs_name}", F{command_name(name)}, {len(params)}, {len(params)}, "{docstring}", NULL);\n'
 
                     fout_defun.write(defun)
+
+    return funcs
 
 
 if __name__ == '__main__':
@@ -302,11 +308,22 @@ if __name__ == '__main__':
         '3_3',
     }
 
-    for feature in spec.iter(tag='feature'):
-        if feature.attrib['api'] != 'gl': continue
+    with open('gl-decl.el', 'w') as fdecl:
+        for feature in spec.iter(tag='feature'):
+            if feature.attrib['api'] != 'gl': continue
 
-        version = feature.attrib['name'][len('GL_VERSION_'):]
-        if version not in versions: continue
+            version = feature.attrib['name'][len('GL_VERSION_'):]
+            if version not in versions: continue
 
-        generate_enums(feature, version)
-        generate_funcs(feature, commands, groups, version)
+            generate_enums(feature, version)
+            funcs = generate_funcs(feature, commands, groups, version)
+
+            fdecl.write(f';;; GL version {version.replace("_", ".")}\n')
+            for fname, params in funcs.items():
+                emacs_name = command_name(fname, '-')
+                fdecl.write(
+                    f'(declare-function {emacs_name} "gl-module.c" ({" ".join(params)}))\n'
+                )
+            fdecl.write('\n\n')
+
+        fdecl.write("(provide 'gl-decl)\n")

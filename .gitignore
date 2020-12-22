@@ -4,3 +4,5 @@ build
 *.so
 
 inc/*.inc
+
+gl-decl.el

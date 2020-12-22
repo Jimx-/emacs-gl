@@ -36,6 +36,8 @@
 (unless (require 'gl-module nil t)
   (error "GL will not work unless `gl-module' is compiled!"))
 
+(require 'gl-decl)
+
 (defvar-local gl--xwidget nil
   "Current GLArea xwidget.")
 
