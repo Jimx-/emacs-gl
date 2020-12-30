@@ -1,6 +1,7 @@
 [requires]
 stb/20200203
 glad/0.1.33
+glm/0.9.9.8
 imgui/1.79
 
 [generators]

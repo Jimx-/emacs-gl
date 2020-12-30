@@ -21,6 +21,7 @@ set(GL_MODULE_SRCLIST
         glfuncs.c
         texture.c
         gui.cpp
+        glm.cpp
         ${PROJECT_BINARY_DIR}/imgui/imgui_impl_opengl3.cpp
         )
 
@@ -33,4 +34,4 @@ set_target_properties(gl-module PROPERTIES
   )
 
 target_link_libraries(gl-module CONAN_PKG::glad OpenGL::GLX CONAN_PKG::stb
-                                CONAN_PKG::imgui)
+                                CONAN_PKG::imgui CONAN_PKG::glm)

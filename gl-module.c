@@ -6,6 +6,7 @@ int plugin_is_GPL_compatible;
 
 extern void glenums_init(emacs_env* env);
 extern void glfuncs_init(emacs_env* env);
+extern void glm_init(emacs_env* env);
 
 extern void gl_helper_texture_init(emacs_env* env);
 extern void gl_helper_gui_init(emacs_env* env);
@@ -19,6 +20,7 @@ int emacs_module_init(struct emacs_runtime* ert)
 
     glenums_init(env);
     glfuncs_init(env);
+    glm_init(env);
 
     gl_helper_texture_init(env);
     gl_helper_gui_init(env);

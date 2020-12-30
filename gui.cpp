@@ -11,195 +11,193 @@ emacs_value Qclassic;
 emacs_value Qpress;
 emacs_value Qrelease;
 
+static emacs_value Fgl_helper_ui_init(emacs_env* env, ptrdiff_t nargs,
+                                      emacs_value args[], void* data)
+{
+    float width = extract_double(env, args[0]);
+    float height = extract_double(env, args[1]);
+    emacs_value style = args[2];
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize.x = width;
+    io.DisplaySize.y = height;
+    io.BackendPlatformName = "emacs";
+
+    if (env->eq(env, style, Qdark))
+        ImGui::StyleColorsDark();
+    else
+        ImGui::StyleColorsClassic();
+
+    unsigned char* tex_pixels = NULL;
+    int tex_w, tex_h;
+    io.Fonts->GetTexDataAsRGBA32(&tex_pixels, &tex_w, &tex_h);
+
+    ImGui_ImplOpenGL3_Init("#version 150");
+
+    for (int i = 0; i < IM_ARRAYSIZE(io.KeyMap); i++)
+        io.KeyMap[i] = i;
+
+    return Qnil;
+}
+
+static emacs_value Fgl_helper_ui_new_frame(emacs_env* env, ptrdiff_t nargs,
+                                           emacs_value args[], void* data)
+{
+    float delta = extract_double(env, args[0]);
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.DeltaTime = delta;
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+
+    return Qnil;
+}
+
+static emacs_value Fgl_helper_ui_render(emacs_env* env, ptrdiff_t nargs,
+                                        emacs_value args[], void* data)
+{
+    ImGuiIO& io = ImGui::GetIO();
+
+    ImGui::EndFrame();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    memset(io.KeysDown, 0, sizeof(io.KeysDown));
+
+    return Qnil;
+}
+
+static emacs_value Fgl_helper_ui_cursor_pos_callback(emacs_env* env,
+                                                     ptrdiff_t nargs,
+                                                     emacs_value args[],
+                                                     void* data)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    double x = extract_double(env, args[0]);
+    double y = extract_double(env, args[1]);
+
+    io.MousePos.x = x;
+    io.MousePos.y = y;
+
+    return Qnil;
+}
+
+static emacs_value Fgl_helper_ui_mouse_button_callback(emacs_env* env,
+                                                       ptrdiff_t nargs,
+                                                       emacs_value args[],
+                                                       void* data)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    int button = extract_integer(env, args[0]);
+    emacs_value action = args[1];
+
+    if (button > 0) io.MouseDown[button - 1] = env->eq(env, action, Qpress);
+
+    return Qnil;
+}
+
+static emacs_value Fgl_helper_ui_send_key(emacs_env* env, ptrdiff_t nargs,
+                                          emacs_value args[], void* data)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    char* str = copy_string_contents(env, args[0], NULL);
+    char key = '\0';
+
+    if (!strcmp(str, "SPC")) {
+        key = ' ';
+    } else if (!strcmp(str, "<backspace>")) {
+        io.KeysDown[ImGuiKey_Backspace] = true;
+    } else if (!strcmp(str, "<tab>")) {
+        io.KeysDown[ImGuiKey_Tab] = true;
+    } else if (!strcmp(str, "<return>")) {
+        io.KeysDown[ImGuiKey_Enter] = true;
+    } else if (!strcmp(str, "<left>")) {
+        io.KeysDown[ImGuiKey_LeftArrow] = true;
+    } else if (!strcmp(str, "<right>")) {
+        io.KeysDown[ImGuiKey_RightArrow] = true;
+    } else if (!strcmp(str, "<up>")) {
+        io.KeysDown[ImGuiKey_UpArrow] = true;
+    } else if (!strcmp(str, "<down>")) {
+        io.KeysDown[ImGuiKey_DownArrow] = true;
+    } else if (!strcmp(str, "<delete>")) {
+        io.KeysDown[ImGuiKey_Delete] = true;
+    } else if (!strcmp(str, "<home>")) {
+        io.KeysDown[ImGuiKey_Home] = true;
+    } else if (!strcmp(str, "<end>")) {
+        io.KeysDown[ImGuiKey_End] = true;
+    } else if (!strcmp(str, "<escape>")) {
+        io.KeysDown[ImGuiKey_Escape] = true;
+    } else {
+        key = *str;
+    }
+
+    free(str);
+
+    if (key) io.AddInputCharacter(key);
+
+    return Qnil;
+}
+
+static emacs_value Fgl_helper_ui_begin_window(emacs_env* env, ptrdiff_t nargs,
+                                              emacs_value args[], void* data)
+{
+    char* title = copy_string_contents(env, args[0], NULL);
+    ImGui::Begin(title);
+    ImGui::SetWindowSize(ImVec2(0, 0));
+    free(title);
+    return Qnil;
+}
+
+static emacs_value Fgl_helper_ui_text(emacs_env* env, ptrdiff_t nargs,
+                                      emacs_value args[], void* data)
+{
+    char* text = copy_string_contents(env, args[0], NULL);
+    ImGui::Text(text);
+    free(text);
+    return Qnil;
+}
+
+static emacs_value Fgl_helper_ui_button(emacs_env* env, ptrdiff_t nargs,
+                                        emacs_value args[], void* data)
+{
+    char* text = copy_string_contents(env, args[0], NULL);
+    bool clicked = ImGui::Button(text);
+    free(text);
+
+    if (clicked) return Qt;
+    return Qnil;
+}
+
+static emacs_value Fgl_helper_ui_input_text(emacs_env* env, ptrdiff_t nargs,
+                                            emacs_value args[], void* data)
+{
+    char buf[4096];
+    char* text = copy_string_contents(env, args[0], NULL);
+    char* str = copy_string_contents(env, args[1], NULL);
+
+    buf[0] = '\0';
+    strncat(buf, str, sizeof(buf) - 1);
+    free(str);
+
+    ImGui::InputText(text, buf, sizeof(buf));
+    free(text);
+
+    return env->make_string(env, buf, (ptrdiff_t)strlen(buf));
+}
+
+static emacs_value Fgl_helper_ui_end_window(emacs_env* env, ptrdiff_t nargs,
+                                            emacs_value args[], void* data)
+{
+    ImGui::End();
+    return Qnil;
+}
+
 extern "C"
 {
-    static emacs_value Fgl_helper_ui_init(emacs_env* env, ptrdiff_t nargs,
-                                          emacs_value args[], void* data)
-    {
-        float width = extract_double(env, args[0]);
-        float height = extract_double(env, args[1]);
-        emacs_value style = args[2];
-
-        IMGUI_CHECKVERSION();
-        ImGui::CreateContext();
-
-        ImGuiIO& io = ImGui::GetIO();
-        io.DisplaySize.x = width;
-        io.DisplaySize.y = height;
-        io.BackendPlatformName = "emacs";
-
-        if (env->eq(env, style, Qdark))
-            ImGui::StyleColorsDark();
-        else
-            ImGui::StyleColorsClassic();
-
-        unsigned char* tex_pixels = NULL;
-        int tex_w, tex_h;
-        io.Fonts->GetTexDataAsRGBA32(&tex_pixels, &tex_w, &tex_h);
-
-        ImGui_ImplOpenGL3_Init("#version 150");
-
-        for (int i = 0; i < IM_ARRAYSIZE(io.KeyMap); i++)
-            io.KeyMap[i] = i;
-
-        return Qnil;
-    }
-
-    static emacs_value Fgl_helper_ui_new_frame(emacs_env* env, ptrdiff_t nargs,
-                                               emacs_value args[], void* data)
-    {
-        float delta = extract_double(env, args[0]);
-
-        ImGuiIO& io = ImGui::GetIO();
-        io.DeltaTime = delta;
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui::NewFrame();
-
-        return Qnil;
-    }
-
-    static emacs_value Fgl_helper_ui_render(emacs_env* env, ptrdiff_t nargs,
-                                            emacs_value args[], void* data)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-
-        ImGui::EndFrame();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        memset(io.KeysDown, 0, sizeof(io.KeysDown));
-
-        return Qnil;
-    }
-
-    static emacs_value Fgl_helper_ui_cursor_pos_callback(emacs_env* env,
-                                                         ptrdiff_t nargs,
-                                                         emacs_value args[],
-                                                         void* data)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        double x = extract_double(env, args[0]);
-        double y = extract_double(env, args[1]);
-
-        io.MousePos.x = x;
-        io.MousePos.y = y;
-
-        return Qnil;
-    }
-
-    static emacs_value Fgl_helper_ui_mouse_button_callback(emacs_env* env,
-                                                           ptrdiff_t nargs,
-                                                           emacs_value args[],
-                                                           void* data)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        int button = extract_integer(env, args[0]);
-        emacs_value action = args[1];
-
-        if (button > 0) io.MouseDown[button - 1] = env->eq(env, action, Qpress);
-
-        return Qnil;
-    }
-
-    static emacs_value Fgl_helper_ui_send_key(emacs_env* env, ptrdiff_t nargs,
-                                              emacs_value args[], void* data)
-    {
-        ImGuiIO& io = ImGui::GetIO();
-        char* str = copy_string_contents(env, args[0], NULL);
-        char key = '\0';
-
-        if (!strcmp(str, "SPC")) {
-            key = ' ';
-        } else if (!strcmp(str, "<backspace>")) {
-            io.KeysDown[ImGuiKey_Backspace] = true;
-        } else if (!strcmp(str, "<tab>")) {
-            io.KeysDown[ImGuiKey_Tab] = true;
-        } else if (!strcmp(str, "<return>")) {
-            io.KeysDown[ImGuiKey_Enter] = true;
-        } else if (!strcmp(str, "<left>")) {
-            io.KeysDown[ImGuiKey_LeftArrow] = true;
-        } else if (!strcmp(str, "<right>")) {
-            io.KeysDown[ImGuiKey_RightArrow] = true;
-        } else if (!strcmp(str, "<up>")) {
-            io.KeysDown[ImGuiKey_UpArrow] = true;
-        } else if (!strcmp(str, "<down>")) {
-            io.KeysDown[ImGuiKey_DownArrow] = true;
-        } else if (!strcmp(str, "<delete>")) {
-            io.KeysDown[ImGuiKey_Delete] = true;
-        } else if (!strcmp(str, "<home>")) {
-            io.KeysDown[ImGuiKey_Home] = true;
-        } else if (!strcmp(str, "<end>")) {
-            io.KeysDown[ImGuiKey_End] = true;
-        } else if (!strcmp(str, "<escape>")) {
-            io.KeysDown[ImGuiKey_Escape] = true;
-        } else {
-            key = *str;
-        }
-
-        free(str);
-
-        if (key) io.AddInputCharacter(key);
-
-        return Qnil;
-    }
-
-    static emacs_value Fgl_helper_ui_begin_window(emacs_env* env,
-                                                  ptrdiff_t nargs,
-                                                  emacs_value args[],
-                                                  void* data)
-    {
-        char* title = copy_string_contents(env, args[0], NULL);
-        ImGui::Begin(title);
-        ImGui::SetWindowSize(ImVec2(0, 0));
-        free(title);
-        return Qnil;
-    }
-
-    static emacs_value Fgl_helper_ui_text(emacs_env* env, ptrdiff_t nargs,
-                                          emacs_value args[], void* data)
-    {
-        char* text = copy_string_contents(env, args[0], NULL);
-        ImGui::Text(text);
-        free(text);
-        return Qnil;
-    }
-
-    static emacs_value Fgl_helper_ui_button(emacs_env* env, ptrdiff_t nargs,
-                                            emacs_value args[], void* data)
-    {
-        char* text = copy_string_contents(env, args[0], NULL);
-        bool clicked = ImGui::Button(text);
-        free(text);
-
-        if (clicked) return Qt;
-        return Qnil;
-    }
-
-    static emacs_value Fgl_helper_ui_input_text(emacs_env* env, ptrdiff_t nargs,
-                                                emacs_value args[], void* data)
-    {
-        char buf[4096];
-        char* text = copy_string_contents(env, args[0], NULL);
-        char* str = copy_string_contents(env, args[1], NULL);
-
-        buf[0] = '\0';
-        strncat(buf, str, sizeof(buf) - 1);
-        free(str);
-
-        ImGui::InputText(text, buf, sizeof(buf));
-        free(text);
-
-        return env->make_string(env, buf, (ptrdiff_t)strlen(buf));
-    }
-
-    static emacs_value Fgl_helper_ui_end_window(emacs_env* env, ptrdiff_t nargs,
-                                                emacs_value args[], void* data)
-    {
-        ImGui::End();
-        return Qnil;
-    }
-
     void gl_helper_gui_init(emacs_env* env)
     {
         Qdark = env->make_global_ref(env, env->intern(env, "dark"));
