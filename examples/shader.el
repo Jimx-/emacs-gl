@@ -60,18 +60,4 @@
   (gl-bind-vertex-array 0)
   )
 
-(let* ((buffer (get-buffer-create "*glarea-xwidget*"))
-       (window (split-window (selected-window) 20)))
-  (set-window-buffer window buffer)
-  (with-current-buffer buffer
-    (insert " ")
-    (goto-char 1)
-    (let ((id (make-xwidget
-               'glarea
-               nil
-               1
-               1
-               '(:init init-cb :render render-cb)
-               (buffer-name))))
-      (put-text-property (point) (+ 1 (point))
-                         'display (list 'xwidget ':xwidget id)))))
+(glarea-new :init #'init-cb :render #'render-cb)

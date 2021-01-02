@@ -1,15 +1,18 @@
 (require 'xwidget)
 (require 'gl)
 
+(defvar widget nil)
+
 (defun init-cb (width height)
   (gl-load)
 
   (gl-helper-ui-init width height 'dark))
 
 (defun render-cb ()
-  "Render callback function."
+  (gl-clear-color 0.5 0.5 0.5 1.0)
+  (gl-clear GL-COLOR-BUFFER-BIT)
+
   (gl-helper-ui-new-frame (/ 1.0 60.0))
-  (draw-ui)
 
   (gl-helper-ui-begin-window "Hello, world!")
   (gl-helper-ui-text "Emacs is the best editor.")
@@ -26,22 +29,9 @@
   (gl-helper-ui-mouse-button-callback button action)
   (xwidget-queue-redraw widget))
 
-(let* ((buffer (get-buffer-create "*glarea-xwidget*"))
-       (window (split-window (selected-window) 20)))
-  (set-window-buffer window buffer)
+(let ((buffer (glarea-new :init #'init-cb
+                          :render #'render-cb
+                          :cursor-pos #'cursor-pos-cb
+                          :mouse-button #'mouse-button-cb)))
   (with-current-buffer buffer
-    (insert " ")
-    (goto-char 1)
-    (let ((id (make-xwidget
-               'glarea
-               nil
-               1
-               1
-               '(:init init-cb
-                       :render render-cb
-                       :cursor-pos cursor-pos-cb
-                       :mouse-button mouse-button-cb)
-               (buffer-name))))
-      (put-text-property (point) (+ 1 (point))
-                         'display (list 'xwidget ':xwidget id)))))
-
+    (setq widget (xwidget-at 1))))

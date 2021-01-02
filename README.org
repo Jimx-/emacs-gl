@@ -51,18 +51,7 @@ After that, you should see a ~gl-module.so~ under the root directory of the repo
 ** Usage
 Before using any command provided by the module, you should make sure that a GL context is properly set up. This can be done by creating a GLArea xwidget. This xwidget also provides an area for these commands to draw to.
 #+BEGIN_SRC emacs-lisp
-(with-current-buffer buffer
-    (insert " ")
-    (goto-char 1)
-    (let ((id (make-xwidget
-               'glarea
-               nil
-               1
-               1
-               '(:init init-cb :render render-cb)
-               (buffer-name))))
-      (put-text-property (point) (+ 1 (point))
-                         'display (list 'xwidget ':xwidget id))))
+(glarea-new :init init-cb :render render-cb)
 #+END_SRC
 
 You also need to provide two callback functions to this xwidget. They are called by the xwidget to initialize the context and render the frames, respectively. The init callback will be invoked before the first frame is rendered with an active GL context so it's the ideal place to load the GL function pointers:

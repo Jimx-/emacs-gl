@@ -130,5 +130,16 @@
   (setq gl--xwidget (xwidget-at (point-min)))
   (setq buffer-read-only t))
 
+(defun glarea-new (&rest args)
+  "Create a new GLArea xwidget with a new buffer."
+  (let ((buffer (generate-new-buffer (or (plist-get args :name) "*glarea*"))))
+    (with-current-buffer buffer
+      (insert " ")
+      (goto-char 1)
+      (let ((id (make-xwidget 'glarea nil 1 1 args (buffer-name))))
+        (put-text-property (point) (+ 1 (point))
+                           'display (list 'xwidget ':xwidget id)))
+      (switch-to-buffer buffer))))
+
 (provide 'gl)
 ;;; gl.el ends here
