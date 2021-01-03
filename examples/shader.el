@@ -2,7 +2,7 @@
 (require 'gl)
 
 
-(defun init-cb (width height)
+(defun init-cb (width height data)
   (gl-load)
 
   (let* ((vertex-shader (gl-create-shader GL-VERTEX-SHADER))
@@ -50,7 +50,7 @@
     (gl-bind-buffer GL-ARRAY-BUFFER 0)
     (gl-bind-vertex-array 0)))
 
-(defun render-cb ()
+(defun render-cb (data)
   (gl-clear-color 0.5 0.5 0.5 1.0)
   (gl-clear GL-COLOR-BUFFER-BIT)
 

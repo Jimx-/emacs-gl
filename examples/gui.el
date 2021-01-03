@@ -3,12 +3,12 @@
 
 (defvar widget nil)
 
-(defun init-cb (width height)
+(defun init-cb (width height data)
   (gl-load)
 
   (gl-helper-ui-init width height 'dark))
 
-(defun render-cb ()
+(defun render-cb (data)
   (gl-clear-color 0.5 0.5 0.5 1.0)
   (gl-clear GL-COLOR-BUFFER-BIT)
 
@@ -21,11 +21,11 @@
 
   (gl-helper-ui-render))
 
-(defun cursor-pos-cb (x y)
+(defun cursor-pos-cb (x y data)
   (gl-helper-ui-cursor-pos-callback x y)
   (xwidget-queue-redraw widget))
 
-(defun mouse-button-cb (button action)
+(defun mouse-button-cb (button action data)
   (gl-helper-ui-mouse-button-callback button action)
   (xwidget-queue-redraw widget))
 

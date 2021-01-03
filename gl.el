@@ -1,6 +1,6 @@
 ;;; gl.el --- OpenGL bindings for Emacs -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2020 by Jin Xue
+;; Copyright (C) 2020-2021 by Jin Xue
 ;;
 ;; Author: Jin Xue <csjinxue@outlook.com>
 ;; Version: 0.0.1

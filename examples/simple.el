@@ -1,10 +1,10 @@
 (require 'xwidget)
 (require 'gl)
 
-(defun init-cb (width height)
+(defun init-cb (width height data)
   (gl-load))
 
-(defun render-cb ()
+(defun render-cb (data)
   (gl-clear-color 0.5 0.5 0.5 1.0)
   (gl-clear GL-COLOR-BUFFER-BIT)
 
