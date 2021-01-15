@@ -139,6 +139,7 @@
       (let ((id (make-xwidget 'glarea nil 1 1 args (buffer-name))))
         (put-text-property (point) (+ 1 (point))
                            'display (list 'xwidget ':xwidget id)))
+      (gl-mode)
       (switch-to-buffer buffer))))
 
 (provide 'gl)

@@ -189,6 +189,22 @@ static emacs_value Fgl_helper_ui_input_text(emacs_env* env, ptrdiff_t nargs,
     return env->make_string(env, buf, (ptrdiff_t)strlen(buf));
 }
 
+static emacs_value Fgl_helper_ui_slider_float(emacs_env* env, ptrdiff_t nargs,
+                                              emacs_value args[], void* data)
+{
+    char* text = copy_string_contents(env, args[0], NULL);
+    float value = extract_double(env, args[1]);
+    float v_min = extract_double(env, args[2]);
+    float v_max = extract_double(env, args[3]);
+
+    if (text) {
+        ImGui::SliderFloat(text, &value, v_min, v_max);
+        free(text);
+    }
+
+    return env->make_float(env, value);
+}
+
 static emacs_value Fgl_helper_ui_end_window(emacs_env* env, ptrdiff_t nargs,
                                             emacs_value args[], void* data)
 {
@@ -246,6 +262,10 @@ extern "C"
               NULL);
         DEFUN("gl-helper-ui-input-text", Fgl_helper_ui_input_text, 2, 2,
               "Display a text input on the current window.\n"
+              "The argument ARG1 is the label to display",
+              NULL);
+        DEFUN("gl-helper-ui-slider-float", Fgl_helper_ui_slider_float, 4, 4,
+              "Display a slider on the current window.\n"
               "The argument ARG1 is the label to display",
               NULL);
     }
