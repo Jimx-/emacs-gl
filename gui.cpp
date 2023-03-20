@@ -12,7 +12,8 @@ emacs_value Qpress;
 emacs_value Qrelease;
 
 static emacs_value Fgl_helper_ui_init(emacs_env* env, ptrdiff_t nargs,
-                                      emacs_value args[], void* data)
+                                      emacs_value args[],
+                                      void* data) EMACS_NOEXCEPT
 {
     float width = extract_double(env, args[0]);
     float height = extract_double(env, args[1]);
@@ -44,7 +45,8 @@ static emacs_value Fgl_helper_ui_init(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fgl_helper_ui_new_frame(emacs_env* env, ptrdiff_t nargs,
-                                           emacs_value args[], void* data)
+                                           emacs_value args[],
+                                           void* data) EMACS_NOEXCEPT
 {
     float delta = extract_double(env, args[0]);
 
@@ -58,7 +60,8 @@ static emacs_value Fgl_helper_ui_new_frame(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fgl_helper_ui_render(emacs_env* env, ptrdiff_t nargs,
-                                        emacs_value args[], void* data)
+                                        emacs_value args[],
+                                        void* data) EMACS_NOEXCEPT
 {
     ImGuiIO& io = ImGui::GetIO();
 
@@ -74,7 +77,7 @@ static emacs_value Fgl_helper_ui_render(emacs_env* env, ptrdiff_t nargs,
 static emacs_value Fgl_helper_ui_cursor_pos_callback(emacs_env* env,
                                                      ptrdiff_t nargs,
                                                      emacs_value args[],
-                                                     void* data)
+                                                     void* data) EMACS_NOEXCEPT
 {
     ImGuiIO& io = ImGui::GetIO();
     double x = extract_double(env, args[0]);
@@ -86,10 +89,10 @@ static emacs_value Fgl_helper_ui_cursor_pos_callback(emacs_env* env,
     return Qnil;
 }
 
-static emacs_value Fgl_helper_ui_mouse_button_callback(emacs_env* env,
-                                                       ptrdiff_t nargs,
-                                                       emacs_value args[],
-                                                       void* data)
+static emacs_value
+Fgl_helper_ui_mouse_button_callback(emacs_env* env, ptrdiff_t nargs,
+                                    emacs_value args[],
+                                    void* data) EMACS_NOEXCEPT
 {
     ImGuiIO& io = ImGui::GetIO();
     int button = extract_integer(env, args[0]);
@@ -101,7 +104,8 @@ static emacs_value Fgl_helper_ui_mouse_button_callback(emacs_env* env,
 }
 
 static emacs_value Fgl_helper_ui_send_key(emacs_env* env, ptrdiff_t nargs,
-                                          emacs_value args[], void* data)
+                                          emacs_value args[],
+                                          void* data) EMACS_NOEXCEPT
 {
     ImGuiIO& io = ImGui::GetIO();
     char* str = copy_string_contents(env, args[0], NULL);
@@ -143,7 +147,8 @@ static emacs_value Fgl_helper_ui_send_key(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fgl_helper_ui_begin_window(emacs_env* env, ptrdiff_t nargs,
-                                              emacs_value args[], void* data)
+                                              emacs_value args[],
+                                              void* data) EMACS_NOEXCEPT
 {
     char* title = copy_string_contents(env, args[0], NULL);
     ImGui::Begin(title);
@@ -153,7 +158,8 @@ static emacs_value Fgl_helper_ui_begin_window(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fgl_helper_ui_text(emacs_env* env, ptrdiff_t nargs,
-                                      emacs_value args[], void* data)
+                                      emacs_value args[],
+                                      void* data) EMACS_NOEXCEPT
 {
     char* text = copy_string_contents(env, args[0], NULL);
     ImGui::Text(text);
@@ -162,7 +168,8 @@ static emacs_value Fgl_helper_ui_text(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fgl_helper_ui_button(emacs_env* env, ptrdiff_t nargs,
-                                        emacs_value args[], void* data)
+                                        emacs_value args[],
+                                        void* data) EMACS_NOEXCEPT
 {
     char* text = copy_string_contents(env, args[0], NULL);
     bool clicked = ImGui::Button(text);
@@ -173,7 +180,8 @@ static emacs_value Fgl_helper_ui_button(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fgl_helper_ui_input_text(emacs_env* env, ptrdiff_t nargs,
-                                            emacs_value args[], void* data)
+                                            emacs_value args[],
+                                            void* data) EMACS_NOEXCEPT
 {
     char buf[4096];
     char* text = copy_string_contents(env, args[0], NULL);
@@ -190,7 +198,8 @@ static emacs_value Fgl_helper_ui_input_text(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fgl_helper_ui_slider_float(emacs_env* env, ptrdiff_t nargs,
-                                              emacs_value args[], void* data)
+                                              emacs_value args[],
+                                              void* data) EMACS_NOEXCEPT
 {
     char* text = copy_string_contents(env, args[0], NULL);
     float value = extract_double(env, args[1]);
@@ -206,7 +215,8 @@ static emacs_value Fgl_helper_ui_slider_float(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fgl_helper_ui_end_window(emacs_env* env, ptrdiff_t nargs,
-                                            emacs_value args[], void* data)
+                                            emacs_value args[],
+                                            void* data) EMACS_NOEXCEPT
 {
     ImGui::End();
     return Qnil;

@@ -36,7 +36,7 @@ static emacs_value make_mat4(emacs_env* env, const glm::mat4& mat)
 }
 
 static emacs_value Fglm_translate(emacs_env* env, ptrdiff_t nargs,
-                                  emacs_value args[], void* data)
+                                  emacs_value args[], void* data) EMACS_NOEXCEPT
 {
     auto m = extract_mat4(env, args[0]);
     float v[3];
@@ -46,7 +46,7 @@ static emacs_value Fglm_translate(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fglm_rotate(emacs_env* env, ptrdiff_t nargs,
-                               emacs_value args[], void* data)
+                               emacs_value args[], void* data) EMACS_NOEXCEPT
 {
     auto m = extract_mat4(env, args[0]);
     float angle = extract_double(env, args[1]);
@@ -57,7 +57,7 @@ static emacs_value Fglm_rotate(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fglm_scale(emacs_env* env, ptrdiff_t nargs,
-                              emacs_value args[], void* data)
+                              emacs_value args[], void* data) EMACS_NOEXCEPT
 {
     auto m = extract_mat4(env, args[0]);
     float v[3];
@@ -67,7 +67,7 @@ static emacs_value Fglm_scale(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fglm_look_at(emacs_env* env, ptrdiff_t nargs,
-                                emacs_value args[], void* data)
+                                emacs_value args[], void* data) EMACS_NOEXCEPT
 {
     float eye[3], center[3], up[3];
 
@@ -82,7 +82,7 @@ static emacs_value Fglm_look_at(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fglm_ortho(emacs_env* env, ptrdiff_t nargs,
-                              emacs_value args[], void* data)
+                              emacs_value args[], void* data) EMACS_NOEXCEPT
 {
     float left = extract_double(env, args[0]);
     float right = extract_double(env, args[1]);
@@ -95,7 +95,7 @@ static emacs_value Fglm_ortho(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fglm_frustum(emacs_env* env, ptrdiff_t nargs,
-                                emacs_value args[], void* data)
+                                emacs_value args[], void* data) EMACS_NOEXCEPT
 {
     float left = extract_double(env, args[0]);
     float right = extract_double(env, args[1]);
@@ -108,7 +108,8 @@ static emacs_value Fglm_frustum(emacs_env* env, ptrdiff_t nargs,
 }
 
 static emacs_value Fglm_perspective(emacs_env* env, ptrdiff_t nargs,
-                                    emacs_value args[], void* data)
+                                    emacs_value args[],
+                                    void* data) EMACS_NOEXCEPT
 {
     float fov = extract_double(env, args[0]);
     float aspect = extract_double(env, args[1]);
